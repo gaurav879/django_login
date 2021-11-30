@@ -8,5 +8,5 @@ urlpatterns = [
     path('logout', LogoutView.as_view()),
     # path('users/actionUrl', RegisterView.as_view()),
     path('actionUrl',RegisterView.home),
-    path(' ',RegisterView.home)
+    path('',RegisterView.home)
 ]

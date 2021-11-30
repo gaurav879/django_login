@@ -17,8 +17,7 @@ class RegisterView(APIView):
         serializer.save()
         return Response(serializer.data)
     def get(self,request):
-        if(request.GET.get('mybtn')):
-            return Response("****")
+        return Response("****")
     def home(request):
         return render (request, 'home.html')
     def index(request):
