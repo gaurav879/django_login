@@ -1,5 +1,6 @@
 from os import name
 from django.http import response
+from rest_framework import serializers
 from users.serializers import UserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -60,7 +61,6 @@ class UserView(APIView):
 
     def post(self, request):
         var=json.loads(request.body)
-
         print(var)
         encoded_jwt = var['jwt']
         print(encoded_jwt)
@@ -71,13 +71,14 @@ class UserView(APIView):
             # {'some': 'payload'}
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated!')
-
         user = User.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
     def delete(self,request):
         var=json.loads(request.body)
-        print(var)
+        # print(var)
         encoded_jwt = var['jwt']
         print(encoded_jwt)
         if not encoded_jwt:
@@ -89,6 +90,26 @@ class UserView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
         User.objects.filter(id=payload['id']).delete()
         return Response("User Deleted")
+
+
+    def put(self,request):
+        var=json.loads(request.body)
+        
+        encoded_jwt = var['jwt']
+        if not encoded_jwt:
+            raise AuthenticationFailed('Unauthenticated!')
+        try:
+            payload = jwt.decode(encoded_jwt, "secret", algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        user = User.objects.filter(id=payload['id']).first()
+        user.name=var['name']
+        user.email=var['email']
+        user.username=var['username']
+        user.address=var['address']
+        user.save()
+        return Response("Fields Updated")
 
 
 class LogoutView(APIView):
