@@ -8,21 +8,27 @@ from .serializers import UserSerializer
 from .models import User
 from django.shortcuts import render
 import jwt,datetime
+import json
 
 
 class RegisterView(APIView):
     def post(self,request):
-        serializer = UserSerializer(data=request.data)
+        # print(request.body)
+        var=json.loads(request.body)
+        serializer = UserSerializer(data=var)
         serializer.is_valid(raise_exception=True)
+        # print(request.body)
         serializer.save()
+        # print(serializer.data)
         return Response(serializer.data)
     def get(self,request):
         return Response("****")
     
 class LoginView(APIView):
     def post(self,request):
-        email= request.data['email']
-        password= request.data['password']
+        var=json.loads(request.body)
+        email= var['email']
+        password= var['password']
 
         user = User.objects.filter(email=email).first()
 
@@ -52,12 +58,14 @@ class LoginView(APIView):
 
 class UserView(APIView):
 
-    def get(self, request):
-        encoded_jwt = request.COOKIES.get('jwt')
+    def post(self, request):
+        var=json.loads(request.body)
 
+        print(var)
+        encoded_jwt = var['jwt']
+        print(encoded_jwt)
         if not encoded_jwt:
             raise AuthenticationFailed('Unauthenticated!')
-
         try:
             payload = jwt.decode(encoded_jwt, "secret", algorithms=["HS256"])
             # {'some': 'payload'}
