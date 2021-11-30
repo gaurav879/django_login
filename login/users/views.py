@@ -75,6 +75,21 @@ class UserView(APIView):
         user = User.objects.filter(id=payload['id']).first()
         serializer = UserSerializer(user)
         return Response(serializer.data)
+    def delete(self,request):
+        var=json.loads(request.body)
+        print(var)
+        encoded_jwt = var['jwt']
+        print(encoded_jwt)
+        if not encoded_jwt:
+            raise AuthenticationFailed('Unauthenticated!')
+        try:
+            payload = jwt.decode(encoded_jwt, "secret", algorithms=["HS256"])
+            # {'some': 'payload'}
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+        User.objects.filter(id=payload['id']).delete()
+        return Response("User Deleted")
+
 
 class LogoutView(APIView):
     def get(self, request):
@@ -84,3 +99,4 @@ class LogoutView(APIView):
             'message': 'success'
         }
         return response
+
