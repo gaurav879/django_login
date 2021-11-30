@@ -18,11 +18,7 @@ class RegisterView(APIView):
         return Response(serializer.data)
     def get(self,request):
         return Response("****")
-    def home(request):
-        return render (request, 'home.html')
-    def index(request):
-        return render (request, 'index.html')
-
+    
 class LoginView(APIView):
     def post(self,request):
         email= request.data['email']
@@ -42,7 +38,7 @@ class LoginView(APIView):
             'iat': datetime.datetime.utcnow()
         }
 
-        token = jwt.encode({"some": "payload"}, "secret", algorithm="HS256")
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
         response.data = {
@@ -73,7 +69,7 @@ class UserView(APIView):
         return Response(serializer.data)
 
 class LogoutView(APIView):
-    def post(self, request):
+    def get(self, request):
         response = Response()
         response.delete_cookie('jwt')
         response.data = {
